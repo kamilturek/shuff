@@ -3,6 +3,7 @@ package shuff
 import (
 	"bufio"
 	"errors"
+	"flag"
 	"fmt"
 	"io"
 	"math/rand"
@@ -10,12 +11,34 @@ import (
 	"time"
 )
 
+const version = "0.2.0"
+
 func RunCLI() {
+	var showHelp bool
+	var showVersion bool
+
+	flag.BoolVar(&showHelp, "help", showHelp, "show help message")
+	flag.BoolVar(&showHelp, "h", showHelp, "show help message (shorthand)")
+	flag.BoolVar(&showVersion, "version", showVersion, "show version")
+	flag.BoolVar(&showVersion, "v", showVersion, "show version (shorthand)")
+	flag.Parse()
+
+	if showHelp {
+		fmt.Fprintf(os.Stderr, "Usage: %s [FILE]\n", os.Args[0])
+		os.Exit(0)
+	}
+
+	if showVersion {
+		fmt.Fprintln(os.Stderr, version)
+		os.Exit(0)
+	}
+
 	s, err := NewShuffler(
 		WithInputFromArgs(os.Args[1:]),
 	)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
 
 	if err := s.Shuffle(); err != nil {
